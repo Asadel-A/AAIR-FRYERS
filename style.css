@@ -1,23 +1,50 @@
-body { 
-    font-family: 'Segoe UI', sans-serif;
-    margin: 0; 
-    line-height: 1.6; 
-    color: #333; 
+:root {
+    --bg-color: #1D546D;
+    --text-primary: #ffffff;
+    --text-secondary: #a1a1a1;
+    --accent: #ffffff;
+    --glass: rgba(255, 255, 255, 0.05);
 }
-nav { 
-    background: #7A003C; 
-    padding: 1rem; 
-    text-align: center; 
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
-nav a { 
-    color: white; 
-    margin: 0 15px; 
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: sans-serif; 
+    line-height: 1.6;
+}
+
+nav {
+    background-color: #061E29;
+    padding: 10px;
+    text-align: center;
+}
+
+nav a {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 5px;
+    background-color: #0b3244; 
+    color: white;
     text-decoration: none; 
-    font-weight: bold; 
+    border-radius: 50px;
+    transition: background-color 0.3s ease;
 }
-nav a:hover { 
-    color: #FDBF57; 
+
+nav a:hover {
+    background-color: #1D546D;
 }
+
+/* Active link style */
+nav a.active {
+    background-color: #1D546D;
+}
+
 header { 
     background: #f4f4f4; 
     padding: 60px 20px; 
