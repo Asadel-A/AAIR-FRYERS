@@ -45,8 +45,23 @@ nav a.active {
     background-color: #1D546D;
 }
 
+.button {
+    display: inline-block;
+    padding: 0.6rem 1.4rem;
+    background-color: var(--accent);
+    text-decoration: none;
+    border-radius: 6px;
+    font-family: 'Times New Roman', serif;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #c2c2c2;
+    transform: translateY(-2px);
+}
+
 header { 
-    background: #f4f4f4; 
+    background: #5e5656; 
     padding: 60px 20px; 
     text-align: center; 
 }
