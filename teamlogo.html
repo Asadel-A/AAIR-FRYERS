@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Team AIRR FRYER Logo</title>
+    <style>
+        canvas { border: 2px solid #333; background: #f0f0f0; }
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    </style>
+</head>
+<body>
+
+<canvas id="logoCanvas" width="600" height="400"></canvas>
+
+<script>
+const canvas = document.getElementById('logoCanvas');
+const ctx = canvas.getContext('2d');
+
+class Fryer {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.scale = 1;
+        this.growth = 0.005; 
+    }
+
+    update() {
+        if (this.scale > 1.05 || this.scale < 0.95) this.growth *= -1;
+        this.scale += this.growth;
+    }
+
+    draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.scale(this.scale, this.scale);
+        
+        ctx.fillStyle = "#222"; 
+        ctx.fillRect(-50, -60, 100, 120);
+        
+        ctx.fillStyle = "#444";
+        ctx.fillRect(-30, 10, 60, 10);
+        
+        ctx.fillStyle = "#00FF00";
+        ctx.font = "10px Monospace";
+        ctx.fillText("COOKING...", -30, -30);
+        
+        ctx.restore();
+    }
+}
+
+class LogoText {
+    constructor(text, x, y) {
+        this.text = text;
+        this.x = x;
+        this.y = y;
+        this.dx = 2; 
+        this.dy = 1; 
+    }
+
+    update() {
+        if (this.x + 100 > canvas.width || this.x < 0) this.dx *= -1;
+        if (this.y > canvas.height || this.y < 20) this.dy *= -1;
+        
+        this.x += this.dx;
+        this.y += this.dy;
+    }
+
+    draw() {
+        ctx.fillStyle = "orange";
+        ctx.font = "bold 30px Arial";
+        ctx.fillText(this.text, this.x, this.y);
+    }
+}
+
+const myFryer = new Fryer(300, 200);
+const myText = new LogoText("AIRR FRYER", 50, 50);
+
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    myFryer.update();
+    myFryer.draw();
+    myText.update();
+    myText.draw();
+    
+    requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+</body>
+</html>
