@@ -1,0 +1,20 @@
+table {
+    margin-top: 30px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th {
+    color: #fec841;
+    font-weight: bold;
+    border-bottom: 1px solid #333;
+}
+
+td, th {
+    padding: 12px;
+}
+
+tr:hover {
+    background: rgba(255,255,255,0.05);
+}
