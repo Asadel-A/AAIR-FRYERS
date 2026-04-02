@@ -6,7 +6,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user_input = $_POST['username'];
     $pass_input = $_POST['password'];
 
-    // Only allow 'member' role
     $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? AND role = 'member'");
     $stmt->execute([$user_input]);
     $user = $stmt->fetch();
@@ -17,8 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['username'] = $user['username'];
         header("Location: index.php");
         exit();
-    }
-    else {
+    } else {
         $error = "Member login failed.";
     }
 }
@@ -27,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <form method="POST">
     <h2>Jazz Club Member Login</h2>
     <?php if (isset($error))
-    echo "<p style='color:red'>$error</p>"; ?>
+        echo "<p style='color:red'>$error</p>"; ?>
     <input type="text" name="username" placeholder="Username" required>
     <input type="password" name="password" placeholder="Password" required>
     <button type="submit">Login</button>

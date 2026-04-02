@@ -6,7 +6,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user_input = $_POST['username'];
     $pass_input = $_POST['password'];
 
-    // Notice the extra "AND role = 'admin'" in the SQL query
     $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? AND role = 'admin'");
     $stmt->execute([$user_input]);
     $user = $stmt->fetch();
@@ -17,8 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['username'] = $user['username'];
         header("Location: admin_dashboard.php");
         exit();
-    }
-    else {
+    } else {
         $error = "Admin access denied or incorrect credentials.";
     }
 }
@@ -27,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <form method="POST">
     <h2>Niko's Admin Login</h2>
     <?php if (isset($error))
-    echo "<p style='color:red'>$error</p>"; ?>
+        echo "<p style='color:red'>$error</p>"; ?>
     <input type="text" name="username" placeholder="Admin Username" required>
     <input type="password" name="password" placeholder="Admin Password" required>
     <button type="submit">Admin Login</button>
