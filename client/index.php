@@ -41,12 +41,12 @@ include 'includes/auth_check.php';
             <li><a href="#shows">Attendance</a></li>
 
             <?php if ($_SESSION['role'] === 'admin'): ?>
-            <li><a href="admin_dashboard.php" class="admin-link">Admin Panel</a></li>
-            <?php
-endif; ?>
+                <li><a href="admin_dashboard.php" class="admin-link">Admin Panel</a></li>
+                <?php
+            endif; ?>
 
             <li><a href="#contact" class="btn-gold">Team</a></li>
-            <li><a href="#contact" class="btn-gold">Gallery</a></li>
+            <li><a href="gallery.php" class="btn-gold">Gallery</a></li>
             <li><a href="logout.php" class="logout-btn">Logout</a></li>
         </ul>
     </nav>
