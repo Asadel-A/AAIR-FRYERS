@@ -2,7 +2,7 @@
 include 'includes/auth_check.php';
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
     <meta charset="UTF-8">
@@ -22,7 +22,7 @@ include 'includes/auth_check.php';
         }
 
         .logout-btn {
-            color: #ff4d4d !important;
+            color: #a42844 !important;
             margin-left: 15px;
         }
     </style>
@@ -38,7 +38,7 @@ include 'includes/auth_check.php';
             </li>
 
             <li><a href="#about">About</a></li>
-            <li><a href="#shows">Attendance</a></li>
+            <li><a href="attendance.php">Attendance</a></li>
 
             <?php if ($_SESSION['role'] === 'admin'): ?>
                 <li><a href="admin_dashboard.php" class="admin-link">Admin Panel</a></li>
@@ -69,21 +69,73 @@ include 'includes/auth_check.php';
     <section id="shows" class="leaderboard dark-bg">
         <div class="container">
             <h2>Leader Board 👑</h2>
-            <div class="board-row">
-                <span>1</span>
-                <span>Pianos</span>
-                <a href="#" class="num-ppl">14</a>
-            </div>
-            <div class="board-row">
-                <span>2</span>
-                <span>Tubas</span>
-                <a href="#" class="num-ppl">12</a>
-            </div>
-            <div class="board-row">
-                <span>3</span>
-                <span>Saxophones</span>
-                <span class="num-ppl">7</span>
-            </div>
+
+            <?php
+            $conn = new mysqli("localhost", "root", "", "jazz_band");
+
+            if ($conn->connect_error) {
+                die("Connection failed: " . $conn->connect_error);
+            }
+
+            $sql = "
+            SELECT 
+                m.instrument,
+
+                SUM(a.present) AS total_attended,
+
+                ROUND(
+                    (SUM(a.present) * 100.0) /
+                    NULLIF(
+                        (COUNT(DISTINCT m.id) * (SELECT COUNT(*) FROM events)),
+                    0)
+                , 1) AS percentage
+
+            FROM members m
+            JOIN attendance a ON m.id = a.member_id
+
+            GROUP BY m.instrument
+            ORDER BY percentage DESC
+            LIMIT 5
+            ";
+
+            $result = $conn->query($sql);
+
+            if (!$result) {
+                die("SQL Error: " . $conn->error);
+            }
+
+            $rank = 1;
+
+            while($row = $result->fetch_assoc()):
+            ?>
+                <div class="board-row">
+                    
+                    <!-- Medal / Rank -->
+                    <span>
+                        <?php 
+                        echo $rank == 1 ? "🥇" : ($rank == 2 ? "🥈" : ($rank == 3 ? "🥉" : $rank));
+                        ?>
+                    </span>
+
+                    <!-- Instrument -->
+                    <span>
+                        <?php echo htmlspecialchars($row['instrument']); ?>
+                    </span>
+
+                    <!-- Percentage + Total Attendance -->
+                    <span class="num-ppl">
+                        <?php echo number_format($row['percentage'], 1); ?>%
+                        <span style="font-size: 0.8rem; color: #aaa;">
+                            (<?php echo $row['total_attended']; ?>)
+                        </span>
+                    </span>
+
+                </div>
+            <?php 
+            $rank++;
+            endwhile; 
+            ?>
+
         </div>
     </section>
 

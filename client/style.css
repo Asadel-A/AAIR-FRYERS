@@ -1,3 +1,11 @@
+:root {
+    --bg-color: #0d0d0d;
+    --text-primary: #ffffff;
+    --text-secondary: #dad8d8;
+    --accent: #ffffff;
+    --glass: rgba(255, 255, 255, 0.05);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -14,8 +22,7 @@ body {
 h1,
 h2 {
     font-family: 'Playfair Display', serif;
-    color: #d4af37;
-    /* Brass/Gold */
+    color: #fec841; /* Brass/Gold */
 }
 
 .container {
@@ -102,7 +109,7 @@ h2 {
     display: inline-block;
     margin-top: 20px;
     padding: 12px 30px;
-    background: #d4af37;
+    background: #fec841;
     color: #000;
     text-decoration: none;
     font-weight: bold;
@@ -126,11 +133,30 @@ h2 {
     border-bottom: 1px solid #333;
 }
 
-.num-ppl {
-    color: #d4af37;
-    text-decoration: none;
-    font-weight: bold;
+.board-row span:first-child {
+    width: 50px;
+    text-align: left;
+    font-size: 1.3rem;
 }
+
+.board-row span:last-child {
+    min-width: 80px;
+    text-align: right;
+}
+
+.board-row:hover {
+    background: rgba(255, 255, 255, 0.03);
+    transition: 0.2s;
+}
+
+.board-row {
+    background: var(--glass);
+    border-radius: 6px;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+}
+
+.num-ppl { color: #fec841; text-decoration: none; font-weight: bold; }
 
 footer {
     padding: 40px;
