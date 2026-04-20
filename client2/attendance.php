@@ -4,27 +4,21 @@ require 'config/db.php';
 
 $currentUserId = $_SESSION['user_id'];
 
-/**
- * Get all events
- */
+/*Get all events*/
 $events = $pdo->query("
     SELECT id, event_name, event_date 
     FROM events 
     ORDER BY event_date ASC
 ")->fetchAll(PDO::FETCH_ASSOC);
 
-/**
- * Get all members
- */
+/*Get all members*/
 $members = $pdo->query("
     SELECT id, first_name, last_name, instrument 
     FROM members 
     ORDER BY instrument, last_name, first_name
 ")->fetchAll(PDO::FETCH_ASSOC);
 
-/**
- * Attendance lookup table
- */
+/*Attendance lookup table*/
 $stmt = $pdo->query("
     SELECT member_id, event_id, status, time_note 
     FROM attendance
@@ -35,9 +29,7 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $attendance[$row['member_id']][$row['event_id']] = $row;
 }
 
-/**
- * Group members by instrument + anonymize others
- */
+/*Group members by instrument + anonymize others*/
 $grouped = [];
 $instrumentCounters = [];
 
@@ -51,7 +43,7 @@ foreach ($members as $m) {
     // Default anonymous label
     $label = $instrument . ' ' . $instrumentCounters[$instrument];
 
-    // If this is the logged-in user → show real name
+    // If user is logged in, show real name
     $isSelf = ($m['id'] == $currentUserId);
 
     if ($isSelf) {
