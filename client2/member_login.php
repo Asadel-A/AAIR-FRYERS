@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute([$user_input]);
     $user = $stmt->fetch();
 
-    if ($user && $pass_input === $user['password']) {
+    if ($user && password_verify($pass_input, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['role'] = $user['role'];
         $_SESSION['username'] = $user['username'];
@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/style.css">
 <form method="POST">
     <h2>Jazz Club Member Login</h2>
     <?php if (isset($error))

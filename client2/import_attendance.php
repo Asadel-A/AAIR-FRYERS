@@ -1,5 +1,12 @@
 <?php
-ob_start();
+/**
+ * 
+ * The required files below are libraries not made by the group.
+ * Requires: libs/SimpleXLSX.php   (read) 
+ *           libs/SimpleXLSXGen.php (write/download)
+ *   Both from: https://github.com/shuchkin/simplexlsx
+ *              https://github.com/shuchkin/simplexlsxgen
+ */
 
 include 'includes/auth_check.php';
 require 'config/db.php';
@@ -11,27 +18,22 @@ if ($_SESSION['role'] !== 'admin') {
     exit();
 }
 
-define('SHEET_NAME',       'Band Attendance 2026 Winter');
-define('ROW_EVENT_NAMES',   0); // Row 1  — event names start at col 4
-define('ROW_DATES',         1); // Row 2  — event dates
-define('ROW_TIMES',         2); // Row 3  — event time ranges
-define('ROW_LOCATIONS',     3); // Row 4  — event locations
-define('ROW_MEMBERS_START', 5); // Row 6  — first member row (row 5 is column headers)
-define('COL_SECTION',       0); // Col A  — section name (only on first member of section)
-define('COL_INSTRUMENT',    1); // Col B  — instrument
-define('COL_FIRST_NAME',    2); // Col C  — first name
-define('COL_LAST_NAME',     3); // Col D  — last name
-define('COL_EVENTS_START',  4); // Col E  — first event attendance column
-define('COL_EVENTS_END',   40); // Col AO — last event attendance column
-define('COL_DIETARY',      41); // Col AP — dietary restrictions
+//  Sheet layout 
+define('SHEET_NAME',        'Band Attendance 2026 Winter');
+define('ROW_EVENT_NAMES',    0);
+define('ROW_DATES',          1);
+define('ROW_TIMES',          2);
+define('ROW_LOCATIONS',      3);
+define('ROW_MEMBERS_START',  5);
+define('COL_SECTION',        0);
+define('COL_INSTRUMENT',     1);
+define('COL_FIRST_NAME',     2);
+define('COL_LAST_NAME',      3);
+define('COL_EVENTS_START',   4);
+define('COL_EVENTS_END',    40);
+define('COL_DIETARY',       41);
 
-/**
- * Parses a raw attendance cell value into a status string and optional time note.
- * Handles "Attending", "Away", "Late HH:MM", and "Leave HH:MM".
- *
- * @param string $raw The raw string value from the Excel cell
- * @return array [status (string), time_note (string|null)]
- */
+
 function parseAttendance(string $raw): array {
     $raw = trim($raw);
     if (stripos($raw, 'Attending') !== false) return ['Attending', null];
@@ -41,132 +43,89 @@ function parseAttendance(string $raw): array {
     return ['Away', null];
 }
 
-/**
- * Parses a time range string (e.g. "6:30-8:30 PM") into 24-hour start and end times.
- *
- * @param string $raw The raw time range string from the Excel cell
- * @return array [start_time (string|null), end_time (string|null)] formatted as "HH:MM:SS"
- */
 function parseTimeRange(string $raw): array {
-    if (preg_match('/(\d{1,2}:\d{2})\s*(AM|PM|noon)?\s*[-–]\s*(\d{1,2}:\d{2})\s*(AM|PM|noon)?/i', $raw, $m)) {
+    if (preg_match('/(\d{1,2}:\d{2})\s*(AM|PM|noon)?\s*[-–]\s*(\d{1,2}:\d{2})\s*(AM|PM|noon)?/i', $raw, $m))
         return [to24h($m[1], $m[2]), to24h($m[3], $m[4] ?: $m[2])];
-    }
     return [null, null];
 }
 
-/**
- * Converts a 12-hour time and AM/PM marker to a "HH:MM:SS" string.
- *
- * @param string $time The time in "H:MM" format
- * @param string $ampm Period indicator: "AM", "PM", or "noon"
- * @return string Time formatted as "HH:MM:SS"
- */
 function to24h(string $time, string $ampm): string {
     [$h, $min] = explode(':', $time);
-    $h    = (int)$h;
-    $ampm = strtolower(trim($ampm));
+    $h = (int)$h; $ampm = strtolower(trim($ampm));
     if ($ampm === 'pm'   && $h !== 12) $h += 12;
     if ($ampm === 'am'   && $h === 12) $h  = 0;
     if ($ampm === 'noon')              $h  = 12;
     return sprintf('%02d:%02d:00', $h, (int)$min);
 }
 
-/**
- * Determines whether an event is Big Band or Combo based on its name.
- *
- * @param string $name The event name
- * @return string "Combo" if the name contains a combo keyword, "Big Band" otherwise
- */
 function detectEventType(string $name): string {
-    foreach (['combo', 'small group'] as $keyword) {
-        if (stripos($name, $keyword) !== false) return 'Combo';
-    }
+    foreach (['combo', 'small group'] as $kw)
+        if (stripos($name, $kw) !== false) return 'Combo';
     return 'Big Band';
 }
 
-/**
- * Returns true if the section string indicates an Adjunct (Combo) member.
- *
- * @param string $section The section value from the Excel cell
- * @return bool True if the section contains "adjunct"
- */
 function isAdjunct(string $section): bool {
     return stripos($section, 'adjunct') !== false;
 }
 
-/**
- * Converts an Excel date value to a "Y-m-d" string.
- * Excel stores dates as serial numbers (days since Dec 30, 1899).
- *
- * @param mixed $val Raw cell value — a numeric serial or a date string
- * @return string|null A "Y-m-d" formatted date, or null if the value is empty or invalid
- */
 function excelDateToString($val): ?string {
     if ($val === null || $val === '') return null;
-    if (is_numeric($val)) {
-        return date('Y-m-d', (int)(((float)$val - 25569) * 86400));
-    }
+    if (is_numeric($val)) return date('Y-m-d', (int)(((float)$val - 25569) * 86400));
     $ts = strtotime((string)$val);
     return $ts ? date('Y-m-d', $ts) : null;
 }
 
 
 if (isset($_GET['action']) && $_GET['action'] === 'download') {
-
     $events = $pdo->query("
         SELECT id, event_name, event_date, start_time, end_time, location, event_type
-        FROM events
-        ORDER BY event_date, start_time
+        FROM events ORDER BY event_date, start_time
     ")->fetchAll(PDO::FETCH_ASSOC);
 
     $members = $pdo->query("
         SELECT id, section, instrument, first_name, last_name, dietary_restrictions, is_adjunct
-        FROM members
-        ORDER BY section, instrument, last_name
+        FROM members ORDER BY section, instrument, last_name
     ")->fetchAll(PDO::FETCH_ASSOC);
 
     $attRows = $pdo->query("SELECT member_id, event_id, status, time_note FROM attendance")->fetchAll(PDO::FETCH_ASSOC);
     $attMap  = [];
-    foreach ($attRows as $r) {
-        $attMap[$r['member_id']][$r['event_id']] = $r;
-    }
+    foreach ($attRows as $r) $attMap[$r['member_id']][$r['event_id']] = $r;
 
     $rows = [];
-
-    // Row 1 — disclaimer + event names
     $r1 = ['We track attendance for scheduling and reimbursements. Not a disciplinary measure.', '', '', 'Event'];
     foreach ($events as $ev) $r1[] = $ev['event_name'];
-    $r1[]   = 'Dietary restrictions';
+    $r1[] = 'Dietary restrictions';
     $rows[] = $r1;
 
-    // Row 2 — dates
+    // Row 2 —> dates
     $r2 = ['', '', '', 'Date'];
     foreach ($events as $ev) $r2[] = $ev['event_date'];
-    $r2[]   = '';
+    $r2[] = '';
     $rows[] = $r2;
 
-    // Row 3 — times
+    // Row 3 —> times
     $r3 = ['', '', '', 'Time'];
     foreach ($events as $ev) {
-        $start  = $ev['start_time'] ? date('g:i', strtotime($ev['start_time'])) : '';
-        $end    = $ev['end_time']   ? date('g:i A', strtotime($ev['end_time'])) : '';
-        $r3[]   = ($start && $end) ? "$start-$end" : '';
+        $start = $ev['start_time'] ? date('g:i', strtotime($ev['start_time'])) : '';
+        $end   = $ev['end_time']   ? date('g:i A', strtotime($ev['end_time']))  : '';
+        $r3[] = $start && $end ? "$start-$end" : '';
     }
-    $r3[]   = '';
+    $r3[] = '';
     $rows[] = $r3;
 
-    // Row 4 — locations
+    // Row 4 —> locations
     $r4 = ['', '', '', 'Location'];
     foreach ($events as $ev) $r4[] = $ev['location'];
-    $r4[]   = '';
+    $r4[] = '';
     $rows[] = $r4;
 
-    // Row 5 — column headers
+    // Row 5 —> column headers
     $r5 = ['Section', 'Instrument', 'First Name', 'Last Name'];
     foreach ($events as $ev) $r5[] = '';
-    $r5[]   = '';
+    $r5[] = '';
     $rows[] = $r5;
 
+    // Member rows
     $prevSection = null;
     foreach ($members as $m) {
         $section = $m['is_adjunct'] ? 'Adjunct (Combo)' : $m['section'];
@@ -177,34 +136,35 @@ if (isset($_GET['action']) && $_GET['action'] === 'download') {
 
         foreach ($events as $ev) {
             $rec = $attMap[$m['id']][$ev['id']] ?? null;
-            if (!$rec)                              $row[] = '';
-            elseif ($rec['status'] === 'Attending') $row[] = 'Attending';
-            elseif ($rec['status'] === 'Away')      $row[] = 'Away';
-            elseif ($rec['status'] === 'Late')      $row[] = 'Late '  . ($rec['time_note'] ?? '');
-            elseif ($rec['status'] === 'Leave')     $row[] = 'Leave ' . ($rec['time_note'] ?? '');
-            else                                    $row[] = $rec['status'];
+            if (!$rec) {
+                $row[] = '';
+            } elseif ($rec['status'] === 'Attending') {
+                $row[] = 'Attending';
+            } elseif ($rec['status'] === 'Away') {
+                $row[] = 'Away';
+            } elseif ($rec['status'] === 'Late') {
+                $row[] = 'Late ' . ($rec['time_note'] ?? '');
+            } elseif ($rec['status'] === 'Leave') {
+                $row[] = 'Leave ' . ($rec['time_note'] ?? '');
+            } else {
+                $row[] = $rec['status'];
+            }
         }
 
-        $row[]  = $m['dietary_restrictions'] ?? 'n/a';
+        $row[] = $m['dietary_restrictions'] ?? 'n/a';
         $rows[] = $row;
     }
 
-    /*
-     * ob_end_clean() discards any buffered output (whitespace, debug text)
-     * before sending the binary Excel file. Without this, corrupted output
-     * headers would cause the download to fail or produce a broken file.
-     */
-    ob_end_clean();
-
+    $filename = 'MEJ_Attendance_Export_' . date('Y-m-d') . '.xlsx';
     $xlsx = SimpleXLSXGen::fromArray($rows);
-    $xlsx->downloadAs('MEJ_Attendance_Export_' . date('Y-m-d') . '.xlsx');
+    $xlsx->downloadAs($filename);
     exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete_import') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_import') {
     header('Content-Type: application/json');
-
     $importId = (int)($_POST['import_id'] ?? 0);
+
     if (!$importId) {
         echo json_encode(['success' => false, 'error' => 'Invalid import ID']);
         exit();
@@ -222,12 +182,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
     try {
         $pdo->beginTransaction();
 
+        // 1. Delete attendance records linked to this import
         $pdo->prepare("
             DELETE a FROM attendance a
             INNER JOIN import_attendance_map m ON a.id = m.attendance_id
             WHERE m.import_id = ?
         ")->execute([$importId]);
 
+        // 2. Delete members that were added by this import
+        //   REQUIRED SAFETY CHECK (only if they have no remaining attendance records — safety check)
         $pdo->prepare("
             DELETE mem FROM members mem
             INNER JOIN import_member_map mm ON mem.id = mm.member_id
@@ -237,6 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
               )
         ")->execute([$importId]);
 
+        // 3. Delete events that were added by this import
         $pdo->prepare("
             DELETE ev FROM events ev
             INNER JOIN import_event_map em ON ev.id = em.event_id
@@ -245,6 +209,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
                   SELECT 1 FROM attendance a WHERE a.event_id = ev.id
               )
         ")->execute([$importId]);
+
+        // 4. Delete the map entries and log entry
         $pdo->prepare("DELETE FROM import_log WHERE id = ?")->execute([$importId]);
 
         $pdo->commit();
@@ -256,7 +222,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
     }
     exit();
 }
-
 
 $message = '';
 $msgType = '';
@@ -274,7 +239,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
         $msgType = 'error';
     } else {
         $xlsx = SimpleXLSX::parse($file['tmp_name']);
-
         if (!$xlsx) {
             $message = "Could not read file: " . SimpleXLSX::parseError();
             $msgType = 'error';
@@ -294,19 +258,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
             } else {
                 $events = [];
                 for ($col = COL_EVENTS_START; $col <= COL_EVENTS_END; $col++) {
-                    $name = trim((string)($rows[ROW_EVENT_NAMES][$col] ?? ''));
+                    $name     = trim((string)($rows[ROW_EVENT_NAMES][$col] ?? ''));
+                    $rawDate  = $rows[ROW_DATES][$col] ?? '';
+                    $rawTime  = trim((string)($rows[ROW_TIMES][$col] ?? ''));
+                    $location = trim((string)($rows[ROW_LOCATIONS][$col] ?? ''));
                     if (empty($name)) continue;
-                    $date = excelDateToString($rows[ROW_DATES][$col] ?? '');
+                    $date = excelDateToString($rawDate);
                     if (!$date) continue;
-                    [$startTime, $endTime] = parseTimeRange(trim((string)($rows[ROW_TIMES][$col] ?? '')));
-                    $events[$col] = [
-                        'name'       => $name,
-                        'date'       => $date,
-                        'start_time' => $startTime,
-                        'end_time'   => $endTime,
-                        'location'   => trim((string)($rows[ROW_LOCATIONS][$col] ?? '')),
-                        'type'       => detectEventType($name),
-                    ];
+                    [$startTime, $endTime] = parseTimeRange($rawTime);
+                    $events[$col] = ['name'=>$name,'date'=>$date,'start_time'=>$startTime,'end_time'=>$endTime,'location'=>$location,'type'=>detectEventType($name)];
                 }
 
                 if (empty($events)) {
@@ -321,13 +281,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
                         ")->execute([$origName, $_SESSION['user_id']]);
                         $importId = (int)$pdo->lastInsertId();
 
-                        $eventIdMap   = [];
-                        $stmtEvent    = $pdo->prepare("INSERT INTO events (event_name, event_date, start_time, end_time, location, event_type) VALUES (:name,:date,:start,:end,:loc,:type) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)");
+                        $eventIdMap  = [];
+                        $newEventIds = [];
+                        $stmtEvent   = $pdo->prepare("
+                            INSERT INTO events (event_name, event_date, start_time, end_time, location, event_type)
+                            VALUES (:name,:date,:start,:end,:loc,:type)
+                            ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)
+                        ");
                         $stmtEventMap = $pdo->prepare("INSERT IGNORE INTO import_event_map (import_id, event_id) VALUES (?,?)");
-
                         foreach ($events as $col => $ev) {
                             $stmtEvent->execute([':name'=>$ev['name'],':date'=>$ev['date'],':start'=>$ev['start_time'],':end'=>$ev['end_time'],':loc'=>$ev['location'],':type'=>$ev['type']]);
-                            $eid              = (int)$pdo->lastInsertId();
+                            $eid = (int)$pdo->lastInsertId();
                             $eventIdMap[$col] = $eid;
                             $stmtEventMap->execute([$importId, $eid]);
                         }
@@ -343,32 +307,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
 
                         for ($r = ROW_MEMBERS_START; $r < count($rows); $r++) {
                             $row        = $rows[$r];
-                            $section    = trim((string)($row[COL_SECTION]    ?? ''));
-                            $instrument = trim((string)($row[COL_INSTRUMENT]  ?? ''));
-                            $firstName  = trim((string)($row[COL_FIRST_NAME]  ?? ''));
-                            $lastName   = trim((string)($row[COL_LAST_NAME]   ?? ''));
-                            $dietary    = trim((string)($row[COL_DIETARY]     ?? ''));
+                            $section    = trim((string)($row[COL_SECTION]   ?? ''));
+                            $instrument = trim((string)($row[COL_INSTRUMENT] ?? ''));
+                            $firstName  = trim((string)($row[COL_FIRST_NAME] ?? ''));
+                            $lastName   = trim((string)($row[COL_LAST_NAME]  ?? ''));
+                            $dietary    = trim((string)($row[COL_DIETARY]    ?? ''));
 
                             if (empty($firstName) && empty($lastName)) {
                                 if (!empty($section)) $currentSection = $section;
                                 continue;
                             }
-                            $adjunct = isAdjunct($currentSection) ? 1 : 0;
 
-                            $stmtMember->execute([
-                                ':fn'   => $firstName,
-                                ':ln'   => $lastName,
-                                ':sec'  => $adjunct ? 'Adjunct' : $currentSection,
-                                ':ins'  => $instrument,
-                                ':diet' => $dietary ?: 'n/a',
-                                ':adj'  => $adjunct,
-                            ]);
+                            $adjunct          = isAdjunct($currentSection) ? 1 : 0;
+                            $effectiveSection = $adjunct ? 'Adjunct' : $currentSection;
 
-                            $stmtGetMember->execute([':fn' => $firstName, ':ln' => $lastName]);
+                            $stmtMember->execute([':fn'=>$firstName,':ln'=>$lastName,':sec'=>$effectiveSection,':ins'=>$instrument,':diet'=>$dietary ?: 'n/a',':adj'=>$adjunct]);
+
+                            $stmtGetMember->execute([':fn'=>$firstName,':ln'=>$lastName]);
                             $memberId = (int)$stmtGetMember->fetchColumn();
                             if (!$memberId) continue;
 
                             $stmtMemberMap->execute([$importId, $memberId]);
+
                             foreach ($eventIdMap as $col => $eventId) {
                                 $rawStatus = trim((string)($row[$col] ?? ''));
                                 if (empty($rawStatus)) { $skipped++; continue; }
@@ -382,7 +342,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
                                     if ($attId) $stmtAttMap->execute([$importId, $attId]);
                                     $inserted++;
                                 } else {
-                                    $skipped++; // duplicate 
+                                    $skipped++;
                                 }
                             }
                         }
@@ -405,6 +365,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
     }
 }
 
+
 $importHistory = $pdo->query("
     SELECT il.id, il.filename, il.imported_at, il.rows_inserted, il.rows_skipped, u.username
     FROM import_log il
@@ -420,20 +381,76 @@ $importHistory = $pdo->query("
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Import Attendance | MEJ Admin</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        .import-box {
+            background: #1a1a1c; border: 1px solid #333; border-radius: 8px;
+            padding: 30px; max-width: 700px; margin: 40px auto;
+        }
+        .import-box h2 { color: #d4af37; margin-bottom: 20px; }
+        .import-box input[type="file"] {
+            display: block; width: 100%; padding: 10px; background: #111;
+            color: #e0d9d1; border: 1px dashed #555; border-radius: 4px; margin-bottom: 15px;
+        }
+        .btn-gold {
+            background: #d4af37; color: #000; border: none; padding: 10px 25px;
+            font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 0.85rem;
+        }
+        .btn-gold:hover { background: #c09a20; }
+        .btn-outline {
+            background: transparent; color: #d4af37; border: 1px solid #d4af37;
+            padding: 10px 22px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;
+            text-decoration: none; display: inline-block;
+        }
+        .btn-outline:hover { background: #d4af37; color: #000; }
+        .btn-danger {
+            background: transparent; color: #e74c3c; border: 1px solid #7a2020;
+            padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.75rem;
+        }
+        .btn-danger:hover { background: #7a2020; color: #fff; }
+        .alert { padding: 12px 16px; border-radius: 4px; margin-bottom: 20px; font-size: 0.9rem; }
+        .alert.success { background: #1e3a2f; border-left: 4px solid #2ecc71; color: #a8f0c6; }
+        .alert.error   { background: #3a1e1e; border-left: 4px solid #e74c3c; color: #f0a8a8; }
+        .history-table { width: 100%; border-collapse: collapse; margin-top: 30px; font-size: 0.82rem; }
+        .history-table th { color: #d4af37; text-align: left; padding: 8px 10px; border-bottom: 1px solid #333; }
+        .history-table td { padding: 8px 10px; border-bottom: 1px solid #222; color: #bbb; vertical-align: middle; }
+        .back-link { display:inline-block; margin:20px 20px 0; color:#d4af37; text-decoration:none; font-size:0.85rem; }
+        .back-link:hover { text-decoration:underline; }
+        .note { font-size: 0.78rem; color: #666; margin-top: 10px; line-height: 1.6; }
+        .action-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 20px; }
+        .section-title { color: #d4af37; font-size: 1rem; margin: 30px 0 10px; }
+
+        /* Warning modal */
+        .warn-backdrop {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.85); z-index: 1000;
+            align-items: center; justify-content: center;
+        }
+        .warn-backdrop.open { display: flex; }
+        .warn-box {
+            background: #1a1a1c; border: 1px solid #7a2020; border-radius: 8px;
+            padding: 32px; max-width: 460px; width: 90%; text-align: center;
+        }
+        .warn-box h3 { color: #e74c3c; margin-bottom: 12px; font-size: 1.1rem; }
+        .warn-box p  { color: #aaa; font-size: 0.85rem; line-height: 1.6; margin-bottom: 20px; }
+        .warn-box .filename { color: #e0d9d1; font-weight: bold; word-break: break-all; }
+        .warn-box .counts   { color: #888; font-size: 0.78rem; margin-bottom: 20px; }
+        .warn-actions { display: flex; gap: 12px; justify-content: center; }
+        .btn-cancel { background: transparent; border: 1px solid #333; color: #888; padding: 9px 22px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+        .btn-cancel:hover { border-color: #555; color: #ccc; }
+        .btn-confirm-delete { background: #7a2020; color: #fff; border: none; padding: 9px 22px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
+        .btn-confirm-delete:hover { background: #a02828; }
+    </style>
 </head>
 <body>
-
-<a href="admin_dashboard.php" class="back-link" style="display:inline-block; margin: 20px 20px 0;">
-    ← Back to Admin Dashboard
-</a>
+<a href="admin_dashboard.php" class="back-link">← Back to Admin Dashboard</a>
 
 <div class="import-box">
-    <h2> Import Attendance from Excel</h2>
+    <h2>📥 Import Attendance from Excel</h2>
 
     <?php if ($message): ?>
         <div class="alert <?php echo $msgType; ?>"><?php echo htmlspecialchars($message); ?></div>
     <?php endif; ?>
+
 
     <form method="POST" enctype="multipart/form-data">
         <label style="color:#aaa; font-size:0.85rem; display:block; margin-bottom:8px;">
@@ -442,13 +459,14 @@ $importHistory = $pdo->query("
         <input type="file" name="excel_file" accept=".xlsx" required>
         <p class="note">
             Reads sheet: <strong style="color:#d4af37">Band Attendance 2026 Winter</strong><br>
-            Events cols E–AO &nbsp;·&nbsp; Dietary col AP &nbsp;·&nbsp; Members start row 6
+            Events cols E–AO · Dietary col AP · Members start row 6
         </p>
         <div class="action-row">
             <button type="submit" class="btn-gold">Upload &amp; Import</button>
-            <a href="?action=download" class="btn-outline"> Download Current Data as Excel</a>
+            <a href="?action=download" class="btn-outline">⬇ Download Current Data as Excel</a>
         </div>
     </form>
+
 
     <?php if (!empty($importHistory)): ?>
     <h3 class="section-title">Import History</h3>
@@ -457,8 +475,8 @@ $importHistory = $pdo->query("
             <th>File</th>
             <th>By</th>
             <th>Date</th>
-            <th style="text-align:center">Inserted</th>
-            <th style="text-align:center">Skipped</th>
+            <th style="text-align:center">✅ In</th>
+            <th style="text-align:center">⏭ Skip</th>
             <th></th>
         </tr>
         <?php foreach ($importHistory as $log): ?>
@@ -469,33 +487,112 @@ $importHistory = $pdo->query("
             <td style="text-align:center; color:#2ecc71"><?php echo (int)$log['rows_inserted']; ?></td>
             <td style="text-align:center; color:#888"><?php echo (int)$log['rows_skipped']; ?></td>
             <td>
-                <button class="btn-danger" onclick="confirmDelete(
-                    <?php echo $log['id']; ?>,
-                    '<?php echo addslashes(htmlspecialchars($log['filename'])); ?>',
-                    <?php echo (int)$log['rows_inserted']; ?>
-                )">Delete</button>
+                <button class="btn-danger"
+                    onclick="confirmDelete(
+                        <?php echo $log['id']; ?>,
+                        '<?php echo addslashes(htmlspecialchars($log['filename'])); ?>',
+                        <?php echo (int)$log['rows_inserted']; ?>
+                    )">
+                     Delete
+                </button>
             </td>
         </tr>
         <?php endforeach; ?>
     </table>
     <?php endif; ?>
 </div>
+
+<!-- delete warning -->
 <div class="warn-backdrop" id="warnBackdrop">
     <div class="warn-box">
-        <h3> Delete Import?</h3>
+        <h3>⚠️ Delete Import?</h3>
         <p>You are about to permanently delete everything added by:</p>
         <p class="filename" id="warnFilename"></p>
-        <p class="counts"   id="warnCounts"></p>
-        <p>This removes all attendance records, members, and events
-           <strong>uniquely</strong> created by this import.
+        <p class="counts" id="warnCounts"></p>
+        <p>This will remove all attendance records, members, and events that were
+           <strong>uniquely</strong> created by this import and not shared with other imports.
            <strong>This cannot be undone.</strong></p>
         <div class="warn-actions">
-            <button class="btn-cancel"         onclick="closeWarn()">Cancel</button>
+            <button class="btn-cancel" onclick="closeWarn()">Cancel</button>
             <button class="btn-confirm-delete" id="confirmDeleteBtn">Yes, Delete Everything</button>
         </div>
     </div>
 </div>
 
-<script src="js/import.js"></script>
+<script>
+let pendingDeleteId = null;
+
+function confirmDelete(importId, filename, insertedCount) {
+    pendingDeleteId = importId;
+    document.getElementById('warnFilename').textContent = filename;
+    document.getElementById('warnCounts').textContent =
+        `This import added ${insertedCount} attendance records.`;
+    document.getElementById('warnBackdrop').classList.add('open');
+}
+
+function closeWarn() {
+    document.getElementById('warnBackdrop').classList.remove('open');
+    pendingDeleteId = null;
+}
+
+// close on backdrop click
+document.getElementById('warnBackdrop').addEventListener('click', function(e) {
+    if (e.target === this) closeWarn();
+});
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+    if (!pendingDeleteId) return;
+
+    const btn = this;
+    btn.disabled = true;
+    btn.textContent = 'Deleting…';
+
+    const formData = new FormData();
+    formData.append('action', 'delete_import');
+    formData.append('import_id', pendingDeleteId);
+
+    fetch('import_attendance.php', { method: 'POST', body: formData })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                // Remove the row from the table without reload
+                const row = document.getElementById(`import-row-${pendingDeleteId}`);
+                if (row) {
+                    row.style.transition = 'opacity 0.4s, transform 0.4s';
+                    row.style.opacity = '0';
+                    row.style.transform = 'translateX(20px)';
+                    setTimeout(() => row.remove(), 400);
+                }
+                closeWarn();
+                showToast(`"${data.filename}" deleted successfully.`, 'success');
+            } else {
+                showToast('Delete failed: ' + data.error, 'error');
+                btn.disabled = false;
+                btn.textContent = 'Yes, Delete Everything';
+            }
+        })
+        .catch(() => {
+            showToast('Network error — please try again.', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Yes, Delete Everything';
+        });
+});
+
+function showToast(msg, type) {
+    const t = document.createElement('div');
+    t.style.cssText = `
+        position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+        padding:12px 24px; border-radius:4px; font-size:0.82rem; z-index:2000;
+        background:${type==='success'?'#1e3a2f':'#3a1e1e'};
+        border-left:4px solid ${type==='success'?'#2ecc71':'#e74c3c'};
+        color:${type==='success'?'#a8f0c6':'#f0a8a8'};
+        box-shadow:0 4px 20px rgba(0,0,0,0.5);
+        transition: opacity 0.4s;
+    `;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(), 400); }, 3500);
+}
+</script>
 </body>
 </html>

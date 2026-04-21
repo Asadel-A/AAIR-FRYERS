@@ -20,7 +20,7 @@ $allImages = [
         'desc'    => 'Director Will Zhang leads the band through a rehearsal set.',
         'tag'     => 'rehearsal',
         'span'    => 'wide',
-        'music'   => 'audio/squibcakes.mp3', 
+        'music'   => 'audio/unforgettable.mp3', // replace song placeholder rightnow.
     ],
     [
         'id'      => 3,
@@ -29,7 +29,7 @@ $allImages = [
         'desc'    => 'The full Mac Eng Jazz ensemble on stage. "Mac Eng Jazz — Final Concert Ft. Will Zhang 2026" written on the chalkboard behind them.',
         'tag'     => 'performance',
         'span'    => 'wide',
-        'music'   => 'audio/spain.mp3', 
+        'music'   => 'audio/unforgettable.mp3', // replace song placeholder rightnow.
     ],
     [
         'id'      => 4,
@@ -38,7 +38,7 @@ $allImages = [
         'desc'    => 'The reed section watches Will intently as he cues the next phrase.',
         'tag'     => 'performance',
         'span'    => 'normal',
-        'music'   => 'audio/runawaybaby.mp3',
+        'music'   => 'audio/unforgettable.mp3', // replace song placeholder rightnow.
     ],
     [
         'id'      => 5,
@@ -47,7 +47,7 @@ $allImages = [
         'desc'    => 'A wide view of the full big band on concert night.',
         'tag'     => 'performance',
         'span'    => 'wide',
-        'music'   => 'audio/porchswingin.mp3',
+        'music'   => 'audio/unforgettable.mp3', // replace song placeholder rightnow.
     ],
     [
         'id'      => 6,
@@ -56,7 +56,7 @@ $allImages = [
         'desc'    => 'Will Zhang with both hands raised, driving the climax of the set.',
         'tag'     => 'performance',
         'span'    => 'tall',
-        'music'   => 'audio/monstersinc.mp3', 
+        'music'   => 'audio/unforgettable.mp3', // replace song placeholder rightnow.
     ],
     [
         'id'      => 7,
@@ -65,7 +65,7 @@ $allImages = [
         'desc'    => 'Alto and clarinet players deep in concentration during the concert.',
         'tag'     => 'performance',
         'span'    => 'normal',
-        'music'   => 'audio/joshinaronud.mp3',
+        'music'   => 'audio/unforgettable.mp3', // replace song placeholder rightnow.
     ],
     [
         'id'      => 8,
@@ -74,7 +74,7 @@ $allImages = [
         'desc'    => 'A sold-out crowd applauds after a memorable performance.',
         'tag'     => 'audience',
         'span'    => 'wide',
-        'music'   => 'audio/havana.mp3', 
+        'music'   => 'audio/unforgettable.mp3', // replace song placeholder rightnow.
     ],
     [
         'id'      => 9,
@@ -83,7 +83,7 @@ $allImages = [
         'desc'    => 'The saxophone section pushes through an energetic arrangement.',
         'tag'     => 'performance',
         'span'    => 'normal',
-        'music'   => 'audio/frankenstein.mp3', 
+        'music'   => 'audio/unforgettable.mp3', // replace song placeholder rightnow.
     ],
     [
         'id'      => 10,
@@ -92,7 +92,7 @@ $allImages = [
         'desc'    => 'Piano and rhythm players share a laugh between sets.',
         'tag'     => 'candid',
         'span'    => 'normal',
-        'music'   => 'audio/digginon.mp3', 
+        'music'   => 'audio/unforgettable.mp3', // replace song placeholder rightnow.
     ],
     [
         'id'      => 11,
@@ -101,7 +101,7 @@ $allImages = [
         'desc'    => 'Will Zhang conducts the second half of the Spring Concert.',
         'tag'     => 'performance',
         'span'    => 'tall',
-        'music'   => 'audio/birdland.mp3', 
+        'music'   => 'audio/unforgettable.mp3', // replace song placeholder rightnow.
     ],
     [
         'id'      => 12,
@@ -110,7 +110,7 @@ $allImages = [
         'desc'    => 'A wide-angle view of the saxophone and clarinet section performing.',
         'tag'     => 'performance',
         'span'    => 'wide',
-        'music'   => 'audio/anotherdayofsun.mp3',
+        'music'   => 'audio/unforgettable.mp3', // replace song placeholder rightnow.
     ],
     [
         'id'      => 13,
@@ -119,7 +119,7 @@ $allImages = [
         'desc'    => 'A proud moment — Will Zhang smiling with the band after a great night.',
         'tag'     => 'candid',
         'span'    => 'normal',
-        'music'   => 'audio/exitmusic.mp3', 
+        'music'   => 'audio/unforgettable.mp3', // replace song placeholder rightnow.
     ],
     [
         'id'      => 14,
@@ -128,7 +128,7 @@ $allImages = [
         'desc'    => 'A soloist waves to the crowd after their featured moment.',
         'tag'     => 'candid',
         'span'    => 'normal',
-        'music'   => 'audio/unforgettable.mp3', // placeholder due to lack of more music available from client
+        'music'   => 'audio/unforgettable.mp3', // replace song placeholder rightnow.
     ],
     [
         'id'      => 15,
@@ -137,7 +137,7 @@ $allImages = [
         'desc'    => 'The ensemble as seen from the back of the lecture hall.',
         'tag'     => 'performance',
         'span'    => 'wide',
-        'music'   => 'audio/unforgettable.mp3', // placeholder.
+        'music'   => 'audio/unforgettable.mp3', // replace song placeholder rightnow.
     ],
     [
         'id'      => 16,
@@ -146,7 +146,7 @@ $allImages = [
         'desc'    => 'Will cues the brass section for a big entrance.',
         'tag'     => 'performance',
         'span'    => 'normal',
-        'music'   => 'audio/unforgettable.mp3',// placeholder. 
+        'music'   => 'audio/unforgettable.mp3',// replace song placeholder rightnow. 
     ],
     [
         'id'      => 17,
@@ -155,7 +155,7 @@ $allImages = [
         'desc'    => 'A vocalist speaks to the audience between songs at the Spring Concert.',
         'tag'     => 'candid',
         'span'    => 'tall',
-        'music'   => 'audio/unforgettable.mp3', // placehodler.
+        'music'   => 'audio/unforgettable.mp3', // replace song placeholder rightnow.
     ],
 ];
 

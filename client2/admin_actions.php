@@ -53,43 +53,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     // --- Generate a secure random 8-character temporary password ---
     $tempPassword = substr(str_shuffle('abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789!@#$'), 0, 8);
+    $hashedPassword = password_hash($tempPassword, PASSWORD_DEFAULT);
 
     // --- INSERT into the users table ---
     try {
         $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$username, $email, $tempPassword, $role]);
+        $stmt->execute([$username, $email, $hashedPassword, $role]);
     } catch (PDOException $e) {
         header("Location: admin_dashboard.php?error=" . urlencode("Database error: " . $e->getMessage()));
         exit();
     }
 
-    // --- Send welcome email with temporary credentials ---
-    $to      = $email;
-    $subject = "Welcome to the Mac Eng Jazz Portal!";
-
-    $message  = "Hello $username,\r\n\r\n";
-    $message .= "An account has been created for you on the Mac Eng Jazz Portal.\r\n\r\n";
-    $message .= "Here are your temporary login credentials:\r\n";
-    $message .= "────────────────────────────────\r\n";
-    $message .= "  Username: $username\r\n";
-    $message .= "  Password: $tempPassword\r\n";
-    $message .= "────────────────────────────────\r\n\r\n";
-    $message .= "Please log in and change your password as soon as possible.\r\n\r\n";
-    $message .= "– Mac Eng Jazz Admin Team\r\n";
-
-    $headers  = "From: noreply@macengjazz.ca\r\n";
-    $headers .= "Reply-To: noreply@macengjazz.ca\r\n";
-    $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
-
-    $mailSent = @mail($to, $subject, $message, $headers);
-
-    // --- Redirect with feedback ---
-    if ($mailSent) {
-        header("Location: admin_dashboard.php?success=" . urlencode("Account created for \"$username\" and credentials emailed to $email."));
-    } else {
-        // Account was still created — just warn that the email failed
-        header("Location: admin_dashboard.php?success=" . urlencode("Account created for \"$username\", but the email to $email could not be sent. Temp password: $tempPassword"));
-    }
+    // --- Redirect with feedback (share temp password with admin to relay manually) ---
+    header("Location: admin_dashboard.php?success=" . urlencode("Account created for \"$username\". Temp password: $tempPassword"));
     exit();
 }
 
