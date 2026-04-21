@@ -97,7 +97,7 @@ $members = $members->fetchAll(PDO::FETCH_ASSOC);
     <?php endif; ?>
 
     <div class="form-card">
-        <h3>➕ Add New Member</h3>
+        <h3>Add New Member</h3>
         <form method="POST">
             <input type="hidden" name="action" value="insert">
             <div class="form-row">
