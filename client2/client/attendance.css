@@ -1,0 +1,94 @@
+/* Table container */
+.attendance-grid {
+    overflow-x: auto;
+    border: 1px solid #333;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+/* Table base */
+.data-table {
+    border-collapse: collapse;
+    width: 100%;
+    background: #121214; 
+}
+
+/* Cells */
+.data-table th,
+.data-table td {
+    padding: 12px;
+    border-right: 1px solid #333;
+    text-align: center;
+}
+
+/* Remove last border */
+.data-table th:last-child,
+.data-table td:last-child {
+    border-right: none;
+}
+
+/* Header */
+.data-table th {
+    color: #d4af37; /* GOLD (fixed) */
+    font-weight: bold;
+    border-bottom: 1px solid #333;
+    background: #0a0a0b;
+}
+
+/* Sticky header */
+.data-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+}
+
+/* Member column */
+.member-name {
+    position: sticky;
+    left: 0;
+    background: #0a0a0b;
+    text-align: left;
+    font-weight: 500;
+    z-index: 2;
+}
+
+/* Instrument headers */
+.instrument-header {
+    background: #121214;
+    color: #d4af37;
+    font-size: 1.05rem;
+    text-align: left;
+    padding: 10px;
+    border-top: 2px solid #333;
+    letter-spacing: 0.5px;
+}
+
+/* Hover effect */
+.data-table tr:hover td {
+    background: rgba(255,255,255,0.04);
+}
+
+/* Status styles */
+.check {
+    color: #4caf50;
+    font-size: 1.2rem;
+}
+
+.late {
+    color: #d4af37; /* match gold instead of bright yellow */
+    font-size: 1.1rem;
+}
+
+.miss {
+    color: #666;
+}
+
+/* Event header text */
+.event-header {
+    font-size: 0.85rem;
+}
+
+.event-date {
+    font-size: 0.7rem;
+    color: #888;
+}
