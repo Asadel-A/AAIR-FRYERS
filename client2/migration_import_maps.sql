@@ -1,9 +1,10 @@
--- add import tracking so imports can be deleted
+-- Name: Asadel Ali
+-- Date: April 19 2026
+-- Description: add import tracking so imports can be deleted
 
 USE mej_attendance;
 
--- Links each import log entry to the attendance rows it created
--- Allows full deletion/rollback of a specific import
+-- allows full deletion/rollback of a specific import
 CREATE TABLE IF NOT EXISTS import_attendance_map (
     import_id    INT NOT NULL,
     attendance_id INT NOT NULL,
@@ -12,7 +13,7 @@ CREATE TABLE IF NOT EXISTS import_attendance_map (
     FOREIGN KEY (attendance_id) REFERENCES attendance(id) ON DELETE CASCADE
 );
 
--- Also tracks which members and events were created by which import
+-- tracks which members and events were created by which import
 CREATE TABLE IF NOT EXISTS import_member_map (
     import_id INT NOT NULL,
     member_id INT NOT NULL,
