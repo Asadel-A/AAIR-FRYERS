@@ -1,6 +1,6 @@
 
 /* 
-Name: Asadel Ali & Krishdeep
+Name: Asadel Ali & Krishdeep & Ivy Zhang
 Date: March 21, 2026
 Description: Gallery page for Mac Eng Jazz website. Displays photos from concerts and events,
 with an integrated music player to play tracks associated with each photo.
