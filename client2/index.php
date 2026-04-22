@@ -130,7 +130,7 @@ function getEventPercentage($pdo, $instrument, $eventId) {
             <li><a href="admin_dashboard.php" class="admin-link">Admin Panel</a></li>
         <?php endif; ?>
 
-        <li><a href="#contact" class="btn-gold">Team</a></li>
+        <li><a href="#contact" class="btn-gold">Contact</a></li>
         <li><a href="gallery.php" class="btn-gold">Gallery</a></li>
         <li><a href="change_password.php">Change Password</a></li>
         <li><a href="logout.php" class="logout-btn">Logout</a></li>
