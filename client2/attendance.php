@@ -1,3 +1,12 @@
+<!-- 
+Name: Ivy Zhang
+Date: April 10 2026
+Description: This file generates an anonymised attendance dashboard for members. 
+It allows a logged-in user to view their own attendance record across all events while seeing the general attendance of the rest
+of the band, without exposing other members' actual names.
+
+-->
+
 <?php
 include 'includes/auth_check.php';
 require 'config/db.php';
@@ -78,13 +87,11 @@ foreach ($members as $m) {
 
     <a href="index.php" class="back-link">← Back</a>
 
-    <h1 class="page-title">🎷 Attendance</h1>
+    <h1 class="page-title"> Attendance</h1>
     <p class="page-sub">Your attendance overview</p>
 
     <div class="attendance-grid">
         <table class="data-table">
-
-            <!-- HEADER -->
             <thead>
                 <tr>
                     <th>Member</th>
