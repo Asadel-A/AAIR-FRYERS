@@ -1,3 +1,11 @@
+<!--
+Name: Aneek & Roshan
+Date: March 27 2026
+Description: Admin page for managing attendance records. Admin users can add, edit, or delete records
+
+-->
+
+
 <?php
 include 'includes/auth_check.php';
 if ($_SESSION['role'] !== 'admin') {
