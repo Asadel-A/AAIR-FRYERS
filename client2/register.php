@@ -1,13 +1,20 @@
+<!--
+Name: Asadel & Roshan
+Date: March 17 2026
+Description: This file hashes and trims passwords when they a user is registering/creating account.
+
+-->
+
 <?php
 require 'config/db.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Trim the username so people don't accidentally register "jsmith " instead of "jsmith"
+    // Trim the username so people don't accidentally register something such as: "jsmith " instead of "jsmith"
     $new_user = trim($_POST['username']);
     $raw_pass = $_POST['password'];
     $role = 'member';
 
-    // THE UPGRADE: Hash the password securely before it touches the database
+    // hashes the password securely before it touches the database
     $hashed_pass = password_hash($raw_pass, PASSWORD_DEFAULT);
 
     $check = $pdo->prepare("SELECT * FROM users WHERE username = ?");
@@ -16,7 +23,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($check->rowCount() > 0) {
         $error = "Username already taken!";
     } else {
-        // Insert the HASHED password, not the raw password
         $stmt = $pdo->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, ?)");
 
         if ($stmt->execute([$new_user, $hashed_pass, $role])) {
@@ -29,12 +35,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 <!DOCTYPE html>
 <html>
-
 <head>
     <link rel="stylesheet" href="css/style.css">
     <title>Join the Jazz Club</title>
 </head>
-
 <body>
     <form method="POST">
         <h2>Create an Account</h2>
@@ -50,5 +54,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <p>Already have an account? <a href="member_login.php">Login here</a></p>
     </form>
 </body>
-
 </html>
