@@ -1,19 +1,19 @@
-<?php
-// On Mac CAS servers, 'localhost' usually works, but sometimes it needs an IP
-$host = "localhost";
-$dbname = "azeemir_db"; // From your previous screenshot
-$username = "azeemir_local";
+<!-- 
+Name: Roshan Azeemi
+Date: Mar 30th 2026
+Description: This file is included in other files as it is needed to connect to the database. 
+-->
 
-// --- IMPORTANT ---
-// You MUST put your actual database password here. 
-// If you don't know it, check your Mac CAS welcome email or Avenue.
+<?php
+$host = "localhost";
+$dbname = "azeemir_db"; 
+$username = "azeemir_local";
 $password = "{+IRXCT9";
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-// Success! (You can comment this out once it works)
-// echo "Connected successfully"; 
+
 }
 catch (PDOException $e) {
     die("Connection failed: " . $e->getMessage());
