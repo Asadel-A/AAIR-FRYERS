@@ -1,3 +1,7 @@
+<!--
+This file is not made by the group and is an imported library so that we can parse through Excel sheets.
+-->
+
 <?php
 
 /** @noinspection UnknownInspectionInspection */
