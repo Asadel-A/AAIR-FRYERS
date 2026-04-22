@@ -1,3 +1,10 @@
+<!--
+Name: Aneek & Roshan
+Date: March 28 2026
+Description: Allows members to log in and even provides a link to a login for admins.
+
+-->
+
 <?php
 require 'config/db.php';
 session_start();
