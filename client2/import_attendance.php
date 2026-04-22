@@ -2,8 +2,7 @@
 Name: Asadel Ali
 Date: March 25, 2026
 Description: Admin page for importing attendance data from an Excel file. Using the files from the library (SimpleXLSX).
-
-*/
+-->
 
 <?php
 ob_start();
@@ -420,13 +419,14 @@ $importHistory = $pdo->query("
     LIMIT 20
 ")->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Import Attendance | MEJ Admin</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
