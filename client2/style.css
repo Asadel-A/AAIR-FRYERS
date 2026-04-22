@@ -1,3 +1,9 @@
+/*
+Name: Ivy Zhang
+Date: April 15, 2026
+Description: This file is the base CSS for the entirety of the website.
+*/
+
 * {
     margin: 0;
     padding: 0;
@@ -22,7 +28,6 @@ h1, h2 {
     padding: 20px;
 }
 
-/* Navigation */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -54,7 +59,6 @@ h1, h2 {
     text-transform: uppercase;
 }
 
-/* Hero Section */
 .hero {
     height: 80vh;
     background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
@@ -79,7 +83,6 @@ h1, h2 {
     border-radius: 2px;
 }
 
-/* Sections */
 .leaderboard { padding: 80px 5%; text-align: center; }
 .dark-bg { background: #121214; }
 
