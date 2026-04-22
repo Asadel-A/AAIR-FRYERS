@@ -1,3 +1,9 @@
+<!--
+Name: Ivy Zhang
+Date: March 16 2026
+Description: This is the homepage of the website, which both members and admins can view. It also includes a leaderboard at the bottom of the page.
+-->
+
 <?php
 include 'includes/auth_check.php';
 require 'config/db.php';
