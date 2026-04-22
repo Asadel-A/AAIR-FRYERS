@@ -1,5 +1,5 @@
 /*
-Name: Asadel Ali
+Name: Asadel Ali & Aneek
 Date: March 22, 2026
 Description: JavaScript for the attendance import page. 
 Handles the delete confirmation modal and AJAX delete requests.
