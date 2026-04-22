@@ -1,3 +1,9 @@
+<!-- 
+Name: Roshan Azeemi
+Date: April 7 2026
+Description: This file creates the login page for the admin, lets the admin log in, and verifies if they are an admin. 
+-->
+
 <?php
 require 'config/db.php';
 session_start();
@@ -21,9 +27,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/style.css">
 <form method="POST">
-    <h2>Niko's Admin Login</h2>
+    <h2>Admin Login</h2>
     <?php if (isset($error))
         echo "<p style='color:red'>$error</p>"; ?>
     <input type="text" name="username" placeholder="Admin Username" required>
