@@ -252,6 +252,7 @@ function getEventPercentage($pdo, $instrument, $eventId) {
 
 <footer id="contact">
     <p>Inquiries: his insta</p>
+    <p><li><a href="https://www.instagram.com/macengjazz/"> Mac Eng Jazz Instagram </a></li></p>
     <p>&copy; 2026 Mac Eng Jazz</p>
 </footer>
 
