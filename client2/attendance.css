@@ -1,4 +1,11 @@
-/* Table container */
+/* 
+Name: Ivy Zhang
+Date: April 10 2026
+Description: This is the CSS file for the attendance/event portion of the admin tabs.
+
+*/
+
+
 .attendance-grid {
     overflow-x: auto;
     border: 1px solid #333;
