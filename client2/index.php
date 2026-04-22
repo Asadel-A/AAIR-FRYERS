@@ -93,7 +93,7 @@ function getEventPercentage($pdo, $instrument, $eventId) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>McMaster Engineering Jazz Band</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
 
     <style>
         .user-info { color: #fff; margin-right: 20px; font-size: 0.9rem; }

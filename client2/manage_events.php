@@ -96,7 +96,7 @@ $events = $events->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Events | MEJ Admin</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
     <style>
         .page-wrap { max-width:1100px; margin:0 auto; padding:30px 20px 60px; }
 
