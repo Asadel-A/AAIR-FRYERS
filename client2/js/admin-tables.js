@@ -1,5 +1,5 @@
 /* 
-Name: Asadel Ali
+Name: Asadel Ali & Roshan Azeemi
 Date: March 24, 2026
 Description: JavaScript for the admin tables (attendance, members, events). 
 Handles toggling between read-only rows and inline edit forms, ensuring only one edit form is open at a time.
