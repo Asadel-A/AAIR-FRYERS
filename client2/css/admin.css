@@ -1,76 +1,246 @@
 /*
-* Name: Ivy Zhang
-* Date: April 6th 2026
-* Description: This is the CSS file for the admin dashboard.
-*/
+ * Name: Ivy Zhang
+ * Date: April 6th 2026
+ * Description: This is the CSS file for the admin dashboard.
+ */
 
-.page-wrap {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 30px 20px 60px;
+/* ── Page Layout ── */
+.page-wrap { max-width: 1200px; margin: 0 auto; padding: 30px 20px 60px; }
+.back-link { display: inline-block; margin-bottom: 20px; color: #d4af37; text-decoration: none; font-size: 0.9rem; }
+.back-link:hover { text-decoration: underline; }
+.page-title { color: #d4af37; margin-bottom: 5px; }
+.page-sub { color: #888; font-size: 0.85rem; margin-bottom: 25px; }
+
+/* ── Alerts ── */
+.alert { padding: 12px 16px; border-radius: 4px; margin-bottom: 20px; font-size: 0.9rem; }
+.alert.success { background: #1e3a2f; border-left: 4px solid #2ecc71; color: #a8f0c6; }
+.alert.error { background: #3a1e1e; border-left: 4px solid #e74c3c; color: #f0a8a8; }
+
+/* ── Form Card ── */
+.form-card { background: #1a1a1c; border: 1px solid #333; border-radius: 8px; padding: 25px; margin-bottom: 30px; }
+.form-card h3 { color: #d4af37; margin-bottom: 15px; font-size: 1rem; }
+.form-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.form-group { display: flex; flex-direction: column; }
+.form-group label { font-size: 0.75rem; color: #888; margin-bottom: 4px; }
+.form-group input, .form-group select { background: #111; border: 1px solid #444; color: #e0d9d1; padding: 8px 10px; border-radius: 4px; font-size: 0.85rem; }
+.form-group input:focus, .form-group select:focus { border-color: #d4af37; outline: none; }
+.checkbox-group { flex-direction: row; align-items: center; gap: 6px; }
+.checkbox-group input[type="checkbox"] { width: 16px; height: 16px; accent-color: #d4af37; }
+
+/* ── Buttons ── */
+.btn-gold { background: #d4af37; color: #000; border: none; padding: 8px 20px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+.btn-gold:hover { background: #c09a20; }
+.btn-danger { background: transparent; color: #e74c3c; border: 1px solid #e74c3c; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+.btn-danger:hover { background: #e74c3c; color: #fff; }
+.btn-edit { background: transparent; color: #3498db; border: 1px solid #3498db; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+.btn-edit:hover { background: #3498db; color: #fff; }
+.btn-save { background: #2ecc71; color: #000; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
+.btn-save:hover { background: #27ae60; }
+.btn-cancel { background: transparent; color: #888; border: 1px solid #555; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+.btn-cancel:hover { background: #333; color: #ccc; }
+
+/* ── Search & Filter ── */
+.search-bar, .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; align-items: center; }
+.search-bar input, .filter-bar input, .filter-bar select { background: #111; border: 1px solid #444; color: #e0d9d1; padding: 8px 10px; border-radius: 4px; font-size: 0.85rem; }
+.search-bar input:focus, .filter-bar input:focus, .filter-bar select:focus { border-color: #d4af37; outline: none; }
+.search-bar input, .filter-bar input { flex: 1; max-width: 320px; }
+
+/* ── Data Table ── */
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.data-table th { text-align: left; padding: 10px; color: #d4af37; border-bottom: 2px solid #333; font-weight: 600; }
+.data-table td { padding: 10px; border-bottom: 1px solid #222; color: #bbb; }
+.data-table tr:hover { background: #1a1a1c; }
+.data-table .actions { white-space: nowrap; display: flex; gap: 6px; }
+.data-table td input, .data-table td select { background: #111; border: 1px solid #444; color: #e0d9d1; padding: 4px 6px; border-radius: 3px; font-size: 0.82rem; width: 100%; }
+
+.empty-state { text-align: center; color: #666; padding: 40px 0; font-size: 0.9rem; }
+
+/* ── Status Pills ── */
+.status-pill { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; }
+.status-pill.attending { background: #1e3a2f; color: #2ecc71; }
+.status-pill.away { background: #3a1e1e; color: #e74c3c; }
+.status-pill.late { background: #3a3520; color: #f39c12; }
+.status-pill.leave { background: #2c2040; color: #b39ddb; }
+
+/* ── Type Badges ── */
+.type-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; }
+.type-badge.big-band { background: #2c2040; color: #b39ddb; }
+.type-badge.combo { background: #1a3a2f; color: #81c784; }
+
+/* ── Dashboard: Stat Grid ── */
+.admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
 }
 
-.back-link {
-  display: inline-block;
-  margin-bottom: 20px;
-  color: #d4af37;
-  text-decoration: none;
-  font-size: 0.9rem;
+.stat-card {
+    background: #1a1a1c;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
 }
 
-.back-link:hover {
-  text-decoration: underline;
+.stat-card .num {
+    font-size: 2rem;
+    color: #d4af37;
+    font-weight: bold;
 }
 
-.page-title {
-  color: #d4af37;
-  margin-bottom: 5px;
+.stat-card .label {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 5px;
 }
 
-.page-sub {
-  color: #888;
-  font-size: 0.85rem;
-  margin-bottom: 25px;
+/* ── Dashboard: Action Cards ── */
+.action-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
 }
 
-.alert {
-  padding: 12px 16px;
-  border-radius: 4px;
-  margin-bottom: 20px;
-  font-size: 0.9rem;
+.action-card {
+    background: #1a1a1c;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 25px;
+    text-decoration: none;
+    color: #e0d9d1;
+    transition: border-color 0.2s;
 }
 
-.alert.success {
-  background: #1e3a2f;
-  border-left: 4px solid #2ecc71;
-  color: #a8f0c6;
+.action-card:hover {
+    border-color: #d4af37;
 }
 
-.alert.error {
-  background: #3a1e1e;
-  border-left: 4px solid #e74c3c;
-  color: #f0a8a8;
+.action-card h3 {
+    color: #d4af37;
+    margin-bottom: 8px;
 }
 
-.form-card {
-  background: #1a1a1c;
-  border: 1px solid #333;
-  border-radius: 8px;
-  padding: 25px;
-  margin-bottom: 30px;
+.action-card p {
+    font-size: 0.85rem;
+    color: #888;
 }
 
-.form-card h3 {
-  color: #d4af37;
-  margin-bottom: 15px;
-  font-size: 1rem;
+/* ── Dashboard: Welcome & Misc ── */
+.welcome {
+    color: #d4af37;
+    margin-bottom: 5px;
 }
 
-.form-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: end;
+.last-import {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 30px;
 }
 
-.form-group {
+/* ── Dashboard: Create Account Form ── */
+.create-account-section {
+    margin-top: 40px;
+    background: #1a1a1c;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 30px;
+}
+
+.create-account-section h2 {
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+}
+
+.create-account-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    align-items: end;
+}
+
+.create-account-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.create-account-form .form-group label {
+    font-size: 0.75rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.create-account-form .form-group input,
+.create-account-form .form-group select {
+    padding: 10px 14px;
+    background: #0d0d0d;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: #e0d9d1;
+    font-size: 0.9rem;
+    font-family: 'Montserrat', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.create-account-form .form-group input:focus,
+.create-account-form .form-group select:focus {
+    border-color: #d4af37;
+}
+
+.create-account-form .form-group input::placeholder {
+    color: #555;
+}
+
+.btn-create {
+    padding: 10px 24px;
+    background: #d4af37;
+    color: #0a0a0b;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    height: fit-content;
+    align-self: end;
+}
+
+.btn-create:hover {
+    background: #e6c34a;
+    transform: translateY(-1px);
+}
+
+.btn-create:active {
+    transform: translateY(0);
+}
+
+/* ── Dashboard: Flash Messages ── */
+.flash-msg {
+    padding: 12px 18px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+.flash-msg.success {
+    background: rgba(76, 175, 80, 0.15);
+    border: 1px solid #4caf50;
+    color: #81c784;
+}
+
+.flash-msg.error {
+    background: rgba(244, 67, 54, 0.15);
+    border: 1px solid #f44336;
+    color: #e57373;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .form-row, .filter-bar { flex-direction: column; }
+    .data-table { font-size: 0.78rem; }
+}
